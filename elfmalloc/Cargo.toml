@@ -33,7 +33,7 @@ use_default_allocator = []
 print_stats = ["nightly"]
 
 [dependencies]
-bagpipe = "0.1.0"
+bagpipe = { path = "../bagpipe" }
 bsalloc = "0.1.0"
 lazy_static = "0.2"
 mmap-alloc = "0.1.0"
