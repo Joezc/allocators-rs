@@ -239,6 +239,7 @@ pub mod global {
 
     impl Drop for GlobalAllocator {
         fn drop(&mut self) {
+            init_begin();
             #[cfg(not(feature = "nightly"))]
             {
                 let chan = DESTRUCTOR_CHAN.lock().unwrap().clone();
@@ -256,7 +257,6 @@ pub mod global {
             #[cfg(feature = "nightly")]
             {
                 #[cfg(target_thread_local)]
-                #[thread_local]
                 {
                     unsafe {
                         PTR = ptr::null_mut();
@@ -343,12 +343,12 @@ pub mod global {
     pub unsafe fn alloc(size: usize) -> *mut u8 {
         #[cfg(feature = "nightly")]
         #[cfg(target_thread_local)]
-        #[thread_local]
         {
             if likely(!PTR.is_null()) {
                 return (*PTR).alloc(size);
             }
         }
+        trace!("fallback alloc({:?})", size);
         if is_initializing() {
             return super::large_alloc::alloc(size);
         }
